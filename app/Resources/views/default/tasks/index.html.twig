@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Inicio {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .chekbox-check {
+        text-decoration: line-through;
+        color: #ccc;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                {# Nombre de lista #}
+                <h2>
+                    Mis Actividades
+                    <a href="{{path('task_new')}}" class="btn btn-outline-info">Agregar actividad</a>    
+                </h2>
+            </div>
+
+            <div class="col-md-12 mt-3 mb-4">
+                <div class="row">
+                    <div class="col-md-4 offset-md-4">
+                        <form action="{{ path('task_list') }}" method="post" class="form-inline">
+                            <input class="form-control basicAutoComplete center" type="text" name="q" autocomplete="off">
+                            <button class="btn btn-primary" type="submit">Buscar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            {# Actividades de la lista #}
+            <div class="col-md-12">
+                <form action="#" method="post">
+                    <ul class="list-group">
+                        {% for cat in categories %}
+                            {% if cat.actividades|length > 0 %}
+                                <li class="list-group-item active">{{ cat.nombre }}</li>
+                                {% for task in cat.actividades %}
+                                    <li class="list-group-item">
+                                        <div class="float-md-left">
+                                            <div class="form-group form-check">
+                                                <input type="checkbox" class="form-check-input chks" 
+                                                    name="act{{ task.id }}" 
+                                                    id="{{ task.id }}" 
+                                                    {% if task.estado %}checked="tre"{% endif %}
+                                                >
+                                                <label class="form-check-label {% if task.estado %}chekbox-check{% endif %}" 
+                                                    id="lblchk{{ task.id }}"
+                                                    for="act{{ task.id }}">{{ task.nombre }}</label>
+                                            </div>
+                                        </div>
+
+                                        {# Opciones de la actividad #}
+                                        <div class="float-md-right">
+                                            <a href="{{ path('task_update', { 'id': task.id }) }}" class="btn btn-outline-info">Editar</a>
+                                            <a href="{{ path('task_remove', { 'id': task.id }) }}" class="btn btn-outline-danger">Eliminar</a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}                        
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+<script>
+    $(document).ready(function() {
+        $('.chks').on('click', function(e){
+            let el = $(this);
+            let id_el = $(this).attr('id');
+            e.preventDefault();
+
+            $.ajax({
+                url : "{{ path('task_mark') }}",
+                type: 'POST',
+                data : {'id': id_el},
+                success: function(res) {
+                    if (res.status == 'success') {
+                        let estado = res.data;
+                        if (!!estado) {
+                            $('#lblchk'+id_el).addClass('chekbox-check');
+                            $(el).prop('checked', true);
+                        } else {
+                            $('#lblchk'+id_el).removeClass('chekbox-check');
+                            $(el).prop('checked', false);
+                        }
+                    }
+                }
+            });
+        });
+
+        $('.basicAutoComplete').autoComplete({
+            resolver: 'custom',
+            events: {
+                search: function (qry, callback) {
+                    $.ajax({
+                        url : "{{ path('task_search_ajax') }}",
+                        type: 'POST',
+                        data : {'q': qry},
+                        success: function(res) {
+                            if (res.status == 'success') {
+                                console.log(res.data);
+                                callback(res.data);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Actividades {% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>
+                	Actividades
+                	<a href="{{path('task_new')}}" class="btn btn-outline-info">Agregar</a>
+                </h2>
+            </div>
+            
+            <div class="col-md-12">
+            	<div class="table-responsive">
+	                <table class="table">
+	                	<thead>
+	                		<tr>
+	                			<th>ID</th>
+	                			<th>Nombre</th>
+	                			<th>Acción</th>
+	                		</tr>
+	                	</thead>
+	                	<tbody>
+	                		{% for task in tasks %}
+							   <tr>
+							   		<td>{{ task.id }}</td>
+							   		<td>{{ task.nombre }}</td>
+							   		<td>
+							   			<a href="{{ path('task_update', {'id' : task.id}) }}">Editar</a>
+							   		</td>
+							   </tr>
+							{% endfor %}
+	                	</tbody>
+	                </table>
+	            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

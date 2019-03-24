@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Categorias {% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>
+                	Categorias
+                	<a href="{{path('category_new')}}" class="btn btn-outline-info">Agregar</a>
+                </h2>
+            </div>
+            
+            <div class="col-md-12">
+            	<div class="table-responsive">
+	                <table class="table">
+	                	<thead>
+	                		<tr>
+	                			<th>ID</th>
+	                			<th>Nombre</th>
+	                			<th>Acción</th>
+	                		</tr>
+	                	</thead>
+	                	<tbody>
+	                		{% for cat in categories %}
+							   <tr>
+							   		<td>{{ cat.id }}</td>
+							   		<td>{{ cat.nombre }}</td>
+							   		<td>
+							   			<a href="{{ path('category_update', {'id' : cat.id}) }}">Editar</a>
+							   		</td>
+							   </tr>
+							{% endfor %}
+	                	</tbody>
+	                </table>
+	            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
