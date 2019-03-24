@@ -79,13 +79,13 @@ class Categoria
     }
 
     /**
-     * Add actividade
+     * Add actividades
      *
      * @param \AppBundle\Entity\Actividad $actividade
      *
      * @return Categoria
      */
-    public function addActividade(\AppBundle\Entity\Actividad $actividade)
+    public function addActividades(\AppBundle\Entity\Actividad $actividade)
     {
         $this->actividades[] = $actividade;
 
@@ -97,7 +97,7 @@ class Categoria
      *
      * @param \AppBundle\Entity\Actividad $actividade
      */
-    public function removeActividade(\AppBundle\Entity\Actividad $actividade)
+    public function removeActividades(\AppBundle\Entity\Actividad $actividade)
     {
         $this->actividades->removeElement($actividade);
     }

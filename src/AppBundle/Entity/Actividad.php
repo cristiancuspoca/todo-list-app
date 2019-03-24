@@ -49,6 +49,14 @@ class Actividad
 
 
     /**
+     * 
+     * @ORM\ManyToOne(targetEntity="Usuario", inversedBy="actividades")
+     * @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     */
+    private $usuario;
+
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="fecha_creacion", type="datetime")
@@ -160,5 +168,30 @@ class Actividad
     public function getCategoria()
     {
         return $this->categoria;
+    }
+
+
+    /**
+     * Set usuario
+     *
+     * @param \AppBundle\Entity\Usuario $usuario
+     *
+     * @return Actividad
+     */
+    public function setUsuario(\AppBundle\Entity\Usuario $usuario = null)
+    {
+        $this->usuario = $usuario;
+
+        return $this;
+    }
+
+    /**
+     * Get usuario
+     *
+     * @return \AppBundle\Entity\usuario
+     */
+    public function getUsuario()
+    {
+        return $this->usuario;
     }
 }

@@ -11,7 +11,7 @@ use AppBundle\Entity\Categoria;
 
 
 /**
- * Clase para gestionar las categorias
+ * Controlador para gestionar las categorias
  * 
  * @Route("/category")
  */

@@ -9,22 +9,27 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use AppBundle\Form\ActividadType;
 use AppBundle\Entity\Actividad;
+use AppBundle\Entity\Usuario;
 
 /**
- * Clase para gestionar las actividades/tareas
+ * Controlador para gestionar las actividades/tareas
  * 
  * @Route("/task")
  */
 class ActividadController extends Controller
 {
-
     /**
      * @Route("/new", name="task_new")
      */
     public function newTask(Request $request) {
+        $id_user = $this->getUser()->getId();
+        $repository = $this->getDoctrine()->getRepository(Usuario::class);
+        $usuario = $repository->findOneById($id_user);
+
         $task = new Actividad();
         $task->setEstado(false);
         $task->setFechaCreacion(new \DateTime());
+        $task->setUsuario($usuario);
         
         // Creamos el formulario
         $form = $this->createForm(ActividadType::class, $task);
@@ -58,7 +63,8 @@ class ActividadController extends Controller
     public function updateTask(Request $request, $id) {
         if ($id) {
             $entityManager = $this->getDoctrine()->getManager();
-            $task = $entityManager->getRepository(Actividad::class)->find($id);
+            $id_user = $this->getUser()->getId();
+            $task = $entityManager->getRepository(Actividad::class)->findOneBy(array('id' => $id, 'usuario' => $id_user));
 
             if (!$task) {
                 throw $this->createNotFoundException('La actividad '.$id.' no existe');
@@ -101,7 +107,8 @@ class ActividadController extends Controller
     public function removeTask(Request $request, $id) {
         if ($id) {
             $entityManager = $this->getDoctrine()->getManager();
-            $task = $entityManager->getRepository(Actividad::class)->find($id);
+            $id_user = $this->getUser()->getId();
+            $task = $entityManager->getRepository(Actividad::class)->findOneBy(array('id' => $id, 'usuario' => $id_user));
 
             if (!$task) {
                 throw $this->createNotFoundException('La actividad '.$id.' no existe');
@@ -124,20 +131,18 @@ class ActividadController extends Controller
      */
     public function markedTask(Request $request) {
         $id = $request->request->get('id');
-
+        $id_user = $this->getUser()->getId();
         $jsonData = array('status' => '', 'data' => '');
         $entityManager = $this->getDoctrine()->getManager();
-        $task = $entityManager->getRepository(Actividad::class)->find($id);
+        $task = $entityManager->getRepository(Actividad::class)->findOneBy(array('id' => $id, 'usuario' => $id_user));
 
-
-        if (!!$task) {
+        if ($request->isXmlHttpRequest() && !!$task) {
             if ($task->getEstado() == 1) {
                 $task->setEstado(FALSE);
             } elseif ($task->getEstado() == 0) {
                 $task->setEstado(TRUE);
             }
 
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($task);
             $entityManager->flush();
 
@@ -155,11 +160,12 @@ class ActividadController extends Controller
     public function searchName(Request $request) {
         $q = $request->request->get('q');
         $jsonData = array('status' => '', 'data' => '');
+        $id_user = $this->getUser()->getId();
 
         if ($request->isXmlHttpRequest() && !!$q) {
             $entityManager = $this->getDoctrine()->getManager();
             $repository = $entityManager->getRepository(Actividad::class);
-            $tasks = $repository->searchByName($q);
+            $tasks = $repository->searchByName($q, $id_user);
             $resData = array();
             foreach ($tasks as $i => $task) {
                 array_push($resData, $task->getNombre());

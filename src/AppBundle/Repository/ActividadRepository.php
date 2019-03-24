@@ -10,14 +10,15 @@ namespace AppBundle\Repository;
  */
 class ActividadRepository extends \Doctrine\ORM\EntityRepository
 {
-	public function searchByName($q) {
+	public function searchByName($q, $id_user) {
 		$entityManager = $this->getEntityManager();
 		$query = $entityManager->createQuery(
             'SELECT a
             FROM AppBundle:Actividad a
-            WHERE a.nombre LIKE :q
+            WHERE a.nombre LIKE :q AND
+            a.usuario = :id_user
             ORDER BY a.estado ASC'
-        )->setParameter('q', '%'.$q.'%');
+        )->setParameters(array('q' => '%'.$q.'%', 'id_user' => $id_user));
         return $query->getResult();
 	}
 }

@@ -3,7 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * Usuario
@@ -11,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Table(name="usuario")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UsuarioRepository")
  */
-class Usuario implements UserInterface, \Serializable
+class Usuario implements AdvancedUserInterface, \Serializable
 {
     /**
      * @var int
@@ -37,6 +38,12 @@ class Usuario implements UserInterface, \Serializable
     private $contrasena;
 
     /**
+     * @ORM\OneToMany(targetEntity="Actividad", mappedBy="usuario")
+     */
+    private $actividades;
+
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="estado", type="boolean",  options={"default" : 0})
@@ -47,6 +54,7 @@ class Usuario implements UserInterface, \Serializable
     public function __construct()
     {
         $this->estado = true;
+        $this->actividades = new ArrayCollection();
         // may not be needed, see section on salt below
         // $this->salt = md5(uniqid('', true));
     }
@@ -58,12 +66,33 @@ class Usuario implements UserInterface, \Serializable
 
     public function getRoles()
     {
-        return ['ROLE_USER'];
+        return ['ROLE_ADMIN'];
     }
 
     public function eraseCredentials()
     {
     }
+
+    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    public function isEnabled()
+    {
+        return $this->estado;
+    }
+
 
     /** @see \Serializable::serialize() */
     public function serialize()
@@ -72,6 +101,7 @@ class Usuario implements UserInterface, \Serializable
             $this->id,
             $this->nombreUsuario,
             $this->contrasena,
+            $this->estado,
             // see section on salt below
             // $this->salt,
         ]);
@@ -84,6 +114,7 @@ class Usuario implements UserInterface, \Serializable
             $this->id,
             $this->nombreUsuario,
             $this->contrasena,
+            $this->estado,
             // see section on salt below
             // $this->salt
         ) = unserialize($serialized, ['allowed_classes' => false]);
@@ -118,7 +149,7 @@ class Usuario implements UserInterface, \Serializable
      *
      * @return string
      */
-    public function getNombreUsuario()
+    public function getUsername()
     {
         return $this->nombreUsuario;
     }
@@ -142,7 +173,7 @@ class Usuario implements UserInterface, \Serializable
      *
      * @return string
      */
-    public function getContrasena()
+    public function getPassword()
     {
         return $this->contrasena;
     }
@@ -169,6 +200,41 @@ class Usuario implements UserInterface, \Serializable
     public function getEstado()
     {
         return $this->estado;
+    }
+
+
+    /**
+     * Add actividades
+     *
+     * @param \AppBundle\Entity\Actividad $actividades
+     *
+     * @return Usuario
+     */
+    public function addActividades(\AppBundle\Entity\Actividad $actividades)
+    {
+        $this->actividades[] = $actividades;
+
+        return $this;
+    }
+
+    /**
+     * Remove actividades
+     *
+     * @param \AppBundle\Entity\Actividad $actividades
+     */
+    public function removeActividades(\AppBundle\Entity\Actividad $actividades)
+    {
+        $this->actividades->removeElement($actividades);
+    }
+
+    /**
+     * Get actividades
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getActividades()
+    {
+        return $this->actividades;
     }
 }
 

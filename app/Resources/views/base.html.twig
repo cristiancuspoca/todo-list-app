@@ -8,6 +8,7 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
+        {% block menu %}
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="{{ path('task_list') }}">Mis Actividades</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,11 +24,14 @@
                         <a class="nav-link" href="{{ path('category_list') }}">Categorias</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Salir</a>
+                        {% if app.session %}
+                            <a class="nav-link" href="{{ path('logout') }}">Salir</a>
+                        {% endif %}
                     </li>
                 </ul>
             </div>
         </nav>
+        {% endblock %}
 
         {% block body %}{% endblock %}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>

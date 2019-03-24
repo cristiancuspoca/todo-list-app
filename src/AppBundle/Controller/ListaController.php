@@ -7,7 +7,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use AppBundle\Entity\Actividad;
 use AppBundle\Entity\Categoria;
+use AppBundle\Entity\Usuario;
 
+/**
+ * Controlador principal
+ */
 class ListaController extends Controller
 {
 
@@ -16,13 +20,17 @@ class ListaController extends Controller
      */
     public function indexAction(Request $request)
     {
+        $session = $request->getSession();
+        $user = $this->getUser();
+        $id_user = $user->getId();
+        
         $q = $request->request->get('q');
         $repository = $this->getDoctrine()->getRepository(Categoria::class);
         if (!!$q) {
-            $categories = $repository->search_category_tasks($q);
+            $categories = $repository->search_category_tasks($q, $id_user);
             dump($categories);
         } else {
-            $categories = $repository->all_category_tasks();
+            $categories = $repository->all_category_tasks($id_user);
         }
 
         /*$categories = $repository->findAll();

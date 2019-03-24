@@ -11,26 +11,28 @@ namespace AppBundle\Repository;
 class CategoriaRepository extends \Doctrine\ORM\EntityRepository
 {
 
-	public function all_category_tasks() {
+	public function all_category_tasks($id_user) {
 		$entityManager = $this->getEntityManager();
 		$query = $entityManager->createQuery(
             'SELECT c, a
             FROM AppBundle:Categoria c 
             JOIN c.actividades a
+            WHERE a.usuario = :id_user
             ORDER BY a.estado ASC'
-        );
+        )->setParameter('id_user', $id_user);
         return $query->getResult();
 	}
 
-    public function search_category_tasks($q) {
+    public function search_category_tasks($q, $id_user) {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT c, a
             FROM AppBundle:Categoria c 
             JOIN c.actividades a
-            WHERE a.nombre LIKE :q
+            WHERE a.nombre LIKE :q AND
+            a.usuario = :id_user
             ORDER BY a.estado ASC'
-        )->setParameter('q', '%'.$q.'%');
+        )->setParameters(array('q' => '%'.$q.'%', 'id_user' => $id_user));
         return $query->getResult();
     }
 }
